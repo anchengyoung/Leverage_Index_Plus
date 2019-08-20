@@ -388,17 +388,15 @@ gm_LI <- rays %>% group_by(PIT_ID, GAME_ID) %>%
                                  gmLI_p = round(mean(LI_p), 2),
                                  gmLI_p3 = round(mean(LI_p3), 2))
 
-##
+## Calculate batter's wRC+ when entering game
 gm_wRC <- rays %>% group_by(PIT_ID, GAME_ID) %>%
   summarize(wRC = first(wRC_plus), wRC3 = first(wRC_p3)) %>%
   group_by(PIT_ID) %>% summarize(wRC_plus = round(mean(wRC), 2),
                                  wRC_p3 = round(mean(wRC3), 2))
 
-rays_RP <- left_join(rays_RP, gm_wRC, by = c("retro_id" = "PIT_ID"))
-##
-
 rays_RP <- left_join(rays_RP, gm_LI, by = c("retro_id" = "PIT_ID"))
 rays_RP <- left_join(rays_RP, avg_LI, by = c("retro_id" = "PIT_ID"))
+rays_RP <- left_join(rays_RP, gm_wRC, by = c("retro_id" = "PIT_ID"))
 
 ## Graphing gmLI+ & pLI+ vs. projected ERA-
 ggplot(rays_RP, aes(ERA_m, gmLI_p3, label = Name)) + geom_point() +
@@ -413,76 +411,9 @@ ggplot(rays_RP, aes(ERA_m, pLI_p, label = Name)) + geom_point() +
   labs(title = "Projected ERA- vs. pLI+ of Rays relievers, 2018",
        x = "ERA-", y = "pLI+", caption = "ERA- projected by Steamer")
 
-
-
-##
-ggplot(rays_RP, aes(ERA_m, wRC_p3, label = Name)) + geom_point() +
+## Graphing projected wRC+ vs. projected ERA-
+ggplot(rays_RP, aes(ERA_m, wRC, label = Name)) + geom_point() +
   geom_text(aes(label = Name), hjust = 0.5, vjust = 1.5) + xlim(80, 125) +
   ylim(80, 110) + geom_smooth(method = lm, se = FALSE) +
   labs(title = "Projected ERA- vs. batter wRC+ of Rays relievers, 2018",
        x = "ERA- (projected by Steamer)", y = "wRC+ of first batter faced")
-
-## ------------------------------------------------------------------------
-
-trout_url <- "https://www.fangraphs.com/statss.aspx?playerid=10155&position=OF"
-link <- "https://www.fangraphs.com/plays.aspx?date=2019-07-31&team=Rays&dh=0&season=2019"
-url <- read_html(trout_url)
-html <- url %>% html_nodes("tr.rgRow grid_projectionsin_show")
-
-table <- html_table(html, fill = TRUE)[[10]]
-
-col_name
-
-col_name<- url %>%
-  html_nodes("th") %>%
-  html_text()
-
-mydata <- url %>%
-  html_nodes("td") %>%
-  html_text()
-
-finaldata <- data.frame(matrix(mydata, ncol=7, byrow=TRUE))
-
-names(finaldata) <- col_name
-
-finaldatacol_name<- url_parse %>%
-  html_nodes("th") %>%
-  html_text()
-
-mydata <- url_parse %>%
-  html_nodes("td") %>%
-  html_text()
-
-finaldata <- data.frame(matrix(mydata, ncol=7, byrow=TRUE))
-
-names(finaldata) <- col_name
-
-finaldata
-
-
-
-
-
-
-
-brlink <- "https://www.baseball-reference.com/play-index/event_finder.cgi?request=1&year=2019&year_to=2019&team_id=TBD&divisory=0&from=divisory&type=b&event=modPA&out_type="
-
-library(rvest)
-
-html_table(link)
-
-play_log <- link %>% read_html() %>%
-  html_nodes(xpath = '//*[@id="root-play-live"]/div/div/div/div[1]/table/tbody') %>% html_table()
-
-
-sample1 %>%
-  html_node("table") %>%
-  html_table()
-
-library(XML)
-library(dplyr)
-
-dat <- readHTMLTable("https://www.baseball-reference.com/play-index/event_finder.cgi?request=1&year=2019&year_to=2019&team_id=TBD&divisory=0&from=divisory&type=b&event=modPA&out_type=")
-
-
-
